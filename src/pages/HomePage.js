@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import Cocktails from "../components/Cocktails";
 
 export default class HomePage extends Component {
   render() {
@@ -14,6 +15,7 @@ export default class HomePage extends Component {
             <Icon name="search" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
+        <Cocktails/>
       </View>
     );
   }

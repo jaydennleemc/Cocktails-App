@@ -7,7 +7,7 @@ export default class SplashPage extends Component {
 
   componentDidMount() {
     setTimeout(() => {
-      Actions.replace('Home');
+      Actions.replace('HomePage');
     }, 2000);
   }
 
