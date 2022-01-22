@@ -3,10 +3,12 @@ import React, { Component, useEffect, useState } from 'react';
 import { Actions } from 'react-native-router-flux';
 import * as apiService from '../services/APIService';
 import FastImage from 'react-native-fast-image';
+import ListLoader from '../components/ListLoader';
 
 export default DrinkListPage = (props) => {
 
-  const [drinks, setdrinks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [drinks, setdrinks] = useState([1, 2, 3, 4, 5]);
 
   const setTitle = () => {
     if (props.category === 'Cocktail') {
@@ -21,11 +23,13 @@ export default DrinkListPage = (props) => {
       apiService.getCocktailDrink().then(res => {
         let data = res.data.drinks;
         setdrinks(data);
+        setLoading(false);
       });
     } else {
       apiService.getOrdinaryDrink().then(res => {
         let data = res.data.drinks;
         setdrinks(data);
+        setLoading(false);
       });
     }
   }
@@ -36,14 +40,22 @@ export default DrinkListPage = (props) => {
   }, []);
 
   const renderItem = ({ item }) => {
-    return (
-      <View style={styles.renderItem}>
-        <FastImage style={styles.renderItem.image} source={{ uri: item.strDrinkThumb }} />
-        <View style={{ alignContent: 'center', justifyContent: 'center' }}>
-          <Text style={styles.renderItem.text}>{item.strDrink}</Text>
+    if (loading) {
+      return (
+        <View style={styles.renderItem}>
+          <ListLoader />
         </View>
-      </View>
-    )
+      )
+    } else {
+      return (
+        <View style={styles.renderItem}>
+          <FastImage style={styles.renderItem.image} source={{ uri: item.strDrinkThumb }} />
+          <View style={{ alignContent: 'center', justifyContent: 'center' }}>
+            <Text style={styles.renderItem.text}>{item.strDrink}</Text>
+          </View>
+        </View>
+      )
+    }
   }
 
   return (
@@ -52,6 +64,7 @@ export default DrinkListPage = (props) => {
         contentContainerStyle={{ paddingBottom: 20 }}
         data={drinks}
         renderItem={renderItem}
+        keyExtractor={item => item.idDrink}
         style={styles.flatlist} />
     </View>
   )

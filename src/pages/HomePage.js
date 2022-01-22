@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import Cocktails from "../components/Cocktails";
+import DrinkList from "../components/DrinkList";
 
 export default class HomePage extends Component {
   render() {
@@ -15,7 +15,8 @@ export default class HomePage extends Component {
             <Icon name="search" size={24} color="#fff" />
           </TouchableOpacity>
         </View>
-        <Cocktails/>
+        <DrinkList category={'Cocktail'} />
+        <DrinkList category={'Ordinary'} />
       </View>
     );
   }
@@ -30,10 +31,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
-  location:{
+  location: {
     color: '#6e6d6f',
     fontSize: 16,
-    fontWeight:'800',
+    fontWeight: '800',
     marginLeft: 12,
   },
   title: {
