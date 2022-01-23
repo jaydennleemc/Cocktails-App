@@ -5,66 +5,77 @@ import { Actions } from 'react-native-router-flux';
 import CircleLoader from './CircleLoader';
 import * as apiService from '../services/APIService';
 
-
-const DrinkList = (props) => {
+const DrinkList = props => {
   const [loading, setLoading] = useState(true);
+  const [isRendered, setIsRendered] = useState(true);
   const [title, setTitle] = useState('Cocktail');
   const [drinks, setDrinks] = useState([1, 2, 3, 4, 5]);
 
-  const setDrinkData = (data) => {
+  const setDrinkData = data => {
     // shuffle drinks array
     data = data.sort(() => Math.random() - 0.5);
     data = data.splice(0, 10);
-    // splice drink withtin 10 drinks
+    // splice drink within 10 drinks
     setDrinks(data);
     setLoading(false);
-  }
+  };
 
   const fetchDrinkList = () => {
-    if (props.category == 'Cocktail') {
+    if (props.category === 'Cocktail') {
       apiService.getCocktailDrink().then(res => {
         let data = res.data.drinks;
-        setDrinkData(data);
+        if (isRendered) {
+          setDrinkData(data);
+        }
       });
     } else {
       apiService.getOrdinaryDrink().then(res => {
         let data = res.data.drinks;
-        setDrinkData(data);
+        if (isRendered) {
+          setDrinkData(data);
+        }
       });
     }
-  }
-
-
+  };
 
   useEffect(() => {
+    setIsRendered(true);
     fetchDrinkList();
-    if (props.category == 'Cocktail') {
+    if (props.category === 'Cocktail') {
       setTitle('Cocktail');
     } else {
       setTitle('Ordinary');
     }
+    return () => {
+      setIsRendered(false);
+    };
   }, []);
 
-
-  const routeToDrinkDetail = (item) => {
-    console.log(item);
-  }
+  const routeToDrinkDetail = item => {
+    Actions.push('DrinkDetailPage', { drink: item });
+  };
 
   const routeToDrinkList = () => {
     Actions.push('DrinkListPage', { category: title });
-  }
+  };
 
   const renderItem = ({ item }) => {
     if (loading) {
       return (
-        <View style={styles.renderItem}>
+        <View style={styles.renderItem} key={item}>
           <CircleLoader />
         </View>
-      )
+      );
     } else {
       return (
-        <TouchableOpacity style={styles.renderItem} onPress={() => routeToDrinkDetail(item)}>
-          <FastImage style={styles.renderItem.image} source={{ uri: item.strDrinkThumb }} />
+        <TouchableOpacity
+          key={item.idDrink}
+          style={styles.renderItem}
+          onPress={() => routeToDrinkDetail(item)}>
+          <FastImage
+            style={styles.renderItem.image}
+            source={{ uri: item.strDrinkThumb }}
+          />
         </TouchableOpacity>
       );
     }
@@ -86,11 +97,10 @@ const DrinkList = (props) => {
         style={styles.flatlist}
         horizontal
         data={drinks}
-        renderItem={renderItem}
-        keyExtractor={item => item.idDrink} />
+        renderItem={renderItem} />
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -106,7 +116,7 @@ const styles = StyleSheet.create({
       color: 'white',
       fontSize: 18,
       fontWeight: 'bold',
-      marginLeft: 12
+      marginLeft: 12,
     },
     seeAll: {
       color: '#fff',
@@ -124,9 +134,9 @@ const styles = StyleSheet.create({
     image: {
       width: 80,
       height: 80,
-      borderRadius: 50
-    }
-  }
+      borderRadius: 50,
+    },
+  },
 });
 
 export default DrinkList;
