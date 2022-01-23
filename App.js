@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Router, Scene, Stack, Actions } from 'react-native-router-flux';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import NetworkChecking from './src/components/NetworkChecking';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import HomePage from './src/pages/HomePage';
 import SplashPage from './src/pages/SplashPage';
 import DrinkListPage from './src/pages/DrinkListPage';
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import DrinkCategoryPage from './src/pages/DrinkCategoryPage';
 import DrinkDetailPage from './src/pages/DrinkDetailPage';
 
 const backImage = () => {
@@ -28,10 +29,11 @@ export default class App extends Component {
           renderBackButton={() => backImage()}
           titleStyle={styles.titleStyle}>
           <Stack key="root" hideNavBar>
-            <Scene key={'SplashPage'} component={SplashPage} initial />
-            <Scene key={'HomePage'} component={HomePage} />
-            <Scene key={'DrinkListPage'} component={DrinkListPage} hideNavBar={false} back />
-            <Scene key={'DrinkDetailPage'} component={DrinkDetailPage} hideNavBar={false} back />
+            <Scene key={'SplashPage'} title=' ' component={SplashPage} initial />
+            <Scene key={'HomePage'} title=' ' component={HomePage} />
+            <Scene key={'DrinkListPage'} title='' component={DrinkListPage} hideNavBar={false} back />
+            <Scene key={'DrinkCategoryPage'} title=' ' component={DrinkCategoryPage} hideNavBar={false} back />
+            <Scene key={'DrinkDetailPage'} title=' ' component={DrinkDetailPage} hideNavBar={false} back />
           </Stack>
         </Router>
       </View>

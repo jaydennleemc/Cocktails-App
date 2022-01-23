@@ -18,7 +18,6 @@ const DrinkDetailPage = (props) => {
       .getDrinkDetail(drinkId)
       .then(res => {
         let data = res.data.drinks[0];
-        console.log(data);
         setDrink(data);
         setLoading(false);
       })

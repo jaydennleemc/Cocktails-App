@@ -11,8 +11,10 @@ import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import * as apiService from '../services/APIService';
 import DrinkList from '../components/DrinkList';
-import { Facebook, Instagram } from 'react-content-loader/native';
+import { Facebook } from 'react-content-loader/native';
 import { Actions } from 'react-native-router-flux';
+import Drawer from 'react-native-drawer';
+import DrawerMenu from '../components/DrawerMenu';
 
 const HomePage = () => {
   const [loading, setLoading] = useState(true);
@@ -51,6 +53,9 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchPopularDrink();
+    setTimeout(() => {
+      this._drawer.open();
+    }, 1500);
   }, []);
 
   const renderItem = ({ item }) => {
@@ -72,34 +77,41 @@ const HomePage = () => {
       );
     }
   };
-
   return (
     <View style={styles.container}>
       <SafeAreaView />
-      <Text style={styles.location}>Hong Kong</Text>
-      <View style={styles.header}>
-        <Text style={styles.title}> Cocktails </Text>
-        <TouchableOpacity style={styles.searchContainer}>
-          <Icon name="search" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        contentContainerStyle={{ paddingBottom: 20 }}
-        numColumns={2}
-        ListHeaderComponent={() => {
-          return (
-            <View style={styles.renderItem}>
-              <DrinkList category={'Cocktail'} />
-              <DrinkList category={'Ordinary'} />
-            </View>
-          );
-        }}
-        style={styles.flatList}
-        data={drinks}
-        renderItem={renderItem}
-        keyExtractor={item => item.idDrink}
-      />
+      <Drawer
+        ref={(ref) => this._drawer = ref}
+        openDrawerOffset={220}
+        content={<DrawerMenu drawer={this._drawer} />}>
+        <Text style={styles.location}>Hong Kong</Text>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => this._drawer.open()}>
+            <Text style={styles.title}> Cocktails </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.searchContainer}>
+            <Icon name="search" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+        <FlatList
+          contentContainerStyle={{ paddingBottom: 20 }}
+          numColumns={2}
+          ListHeaderComponent={() => {
+            return (
+              <View style={styles.renderItem}>
+                <DrinkList category={'Cocktail'} />
+                <DrinkList category={'Ordinary'} />
+              </View>
+            );
+          }}
+          style={styles.flatList}
+          data={drinks}
+          renderItem={renderItem}
+          keyExtractor={item => item.idDrink}
+        />
+      </Drawer>
     </View>
+
   );
 };
 

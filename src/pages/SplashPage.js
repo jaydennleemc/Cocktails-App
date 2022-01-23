@@ -26,10 +26,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    backgroundColor: '#000',
+
   },
   splash: {
     width: 200,
     height: 200,
   }
-})
+});

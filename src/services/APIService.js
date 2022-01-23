@@ -17,3 +17,22 @@ export const getPopularDrink = () => {
 export const getDrinkDetail = id => {
   return axios.get(`${baseUrl}/lookup.php?i=${id}`);
 };
+
+
+export const getDrinksByCategory = category => {
+  let url = '';
+  if (category === 'Cocktail') {
+    url = `${baseUrl}/filter.php?c=Cocktail`;
+  } else if (category === 'Ordinary') {
+    url = `${baseUrl}/filter.php?c=Ordinary_Drink`;
+  } else if (category === 'Alcoholic') {
+    url = `${baseUrl}/filter.php?a=Alcoholic`;
+  } else if (category === 'Non Alcoholic') {
+    url = `${baseUrl}/filter.php?a=Non_Alcoholic`;
+  } else if (category === 'Cocktail Glass') {
+    url = `${baseUrl}/filter.php?g=Cocktail_glass`;
+  } else if (category === 'Champagne Flute') {
+    url = `${baseUrl}/filter.php?g=Champagne_flute`;
+  }
+  return axios.get(url);
+};
