@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -6,112 +6,103 @@ import {
   TouchableOpacity,
   View,
   FlatList,
+  Image,
 } from 'react-native';
-import FastImage from 'react-native-fast-image';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useNavigation } from '@react-navigation/native';
 import * as apiService from '../services/APIService';
 import DrinkList from '../components/DrinkList';
 import { Facebook } from 'react-content-loader/native';
-import { Actions } from 'react-native-router-flux';
-import Drawer from 'react-native-drawer';
-import DrawerMenu from '../components/DrawerMenu';
 
 const HomePage = () => {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [drinks, setDrinks] = useState([1, 2, 3]);
 
   const fetchPopularDrink = () => {
-    apiService.getCocktailDrink().then(res => {
-      let data = res.data.drinks;
-      setLoading(false);
-      data = data.map(item => {
-        return {
+    Promise.all([
+      apiService.getCocktailDrink(),
+      apiService.getOrdinaryDrink(),
+    ])
+      .then(([cocktailRes, ordinaryRes]) => {
+        const cocktailData = (cocktailRes?.data?.drinks || []).map(item => ({
           ...item,
-          strType: 'Cocktail'
-        };
-      });
-      setDrinks(data);
-    }, error => {
-      console.log(error);
-    });
-
-    apiService.getOrdinaryDrink().then(res => {
-      let data = res.data.drinks;
-      data = data.map(item => {
-        return {
+          strType: 'Cocktail',
+        }));
+        const ordinaryData = (ordinaryRes?.data?.drinks || []).map(item => ({
           ...item,
-          strType: 'Ordinary'
-        };
+          strType: 'Ordinary',
+        }));
+        const combined = [...cocktailData, ...ordinaryData].sort(
+          () => Math.random() - 0.5,
+        );
+        setDrinks(combined);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.log(error);
+        setLoading(false);
       });
-      let myDrinks = drinks.concat(data);
-      myDrinks = myDrinks.sort(() => Math.random() - 0.5);
-      setDrinks(myDrinks);
-    }, error => {
-      console.log(error);
-    });
   };
 
   useEffect(() => {
     fetchPopularDrink();
-    setTimeout(() => {
-      this._drawer.open();
+    const timer = setTimeout(() => {
+      navigation.openDrawer();
     }, 1500);
-  }, []);
+    return () => clearTimeout(timer);
+  }, [navigation]);
 
   const renderItem = ({ item }) => {
     if (loading) {
       return <Facebook />;
-    } else {
-      return (
-        <View style={styles.renderItem} key={item.idDrink}>
-          <TouchableOpacity style={styles.renderItem.imageContainer} onPress={() => Actions.push('DrinkDetailPage', { drink: item })}>
-            <FastImage
-              resizeMode="stretch"
-              style={styles.renderItem.image}
-              source={{ uri: item.strDrinkThumb }}
-            />
-          </TouchableOpacity>
-          <Text style={styles.renderItem.category}>{item.strType}</Text>
-          <Text style={styles.renderItem.name}>{item.strDrink}</Text>
-        </View>
-      );
     }
+    return (
+      <View style={styles.renderItem} key={item.idDrink}>
+        <TouchableOpacity
+          style={styles.renderItem.imageContainer}
+          onPress={() => navigation.navigate('DrinkDetailPage', { drink: item })}>
+          <Image
+            resizeMode="stretch"
+            style={styles.renderItem.image}
+            source={{ uri: item.strDrinkThumb }}
+          />
+        </TouchableOpacity>
+        <Text style={styles.renderItem.category}>{item.strType}</Text>
+        <Text style={styles.renderItem.name}>{item.strDrink}</Text>
+      </View>
+    );
   };
+
   return (
     <View style={styles.container}>
       <SafeAreaView />
-      <Drawer
-        ref={(ref) => this._drawer = ref}
-        openDrawerOffset={220}
-        content={<DrawerMenu drawer={this._drawer} />}>
-        <Text style={styles.location}>Hong Kong</Text>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => this._drawer.open()}>
-            <Text style={styles.title}> Cocktails </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.searchContainer}>
-            <Icon name="search" size={24} color="#fff" />
-          </TouchableOpacity>
-        </View>
-        <FlatList
-          contentContainerStyle={{ paddingBottom: 20 }}
-          numColumns={2}
-          ListHeaderComponent={() => {
-            return (
-              <View style={styles.renderItem}>
-                <DrinkList category={'Cocktail'} />
-                <DrinkList category={'Ordinary'} />
-              </View>
-            );
-          }}
-          style={styles.flatList}
-          data={drinks}
-          renderItem={renderItem}
-          keyExtractor={item => item.idDrink}
-        />
-      </Drawer>
+      <Text style={styles.location}>Hong Kong</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <Text style={styles.title}> Cocktails </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.searchContainer}>
+          <Icon name="search" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+      <FlatList
+        contentContainerStyle={{ paddingBottom: 20 }}
+        numColumns={2}
+        ListHeaderComponent={() => {
+          return (
+            <View style={styles.renderItem}>
+              <DrinkList category={'Cocktail'} />
+              <DrinkList category={'Ordinary'} />
+            </View>
+          );
+        }}
+        style={styles.flatList}
+        data={drinks}
+        renderItem={renderItem}
+        keyExtractor={item => item.idDrink}
+      />
     </View>
-
   );
 };
 

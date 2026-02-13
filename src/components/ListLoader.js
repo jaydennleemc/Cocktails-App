@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import ContentLoader, { Rect, Circle } from 'react-content-loader/native'
+import ContentLoader, { Rect, Circle } from 'react-content-loader/native';
 
-export default ListLoader = () => (
+const ListLoader = () => (
   <View style={styles.container}>
     <ContentLoader
       height={140}
@@ -15,12 +15,14 @@ export default ListLoader = () => (
       <Rect x="80" y="40" rx="3" ry="3" width="250" height="10" />
     </ContentLoader>
   </View>
-)
+);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: '100%',
     width: '100%',
-  }
+  },
 });
+
+export default ListLoader;

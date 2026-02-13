@@ -1,44 +1,48 @@
-import React, { Component, useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Actions } from 'react-native-router-flux';
+import { useNavigation } from '@react-navigation/native';
 
-const DrawerMenu = (props) => {
-
-  const [menus, setMenus] = useState([
+const DrawerMenu = () => {
+  const navigation = useNavigation();
+  const [menus] = useState([
     {
       name: 'Alcoholic',
-      value: 'Alcoholic'
+      value: 'Alcoholic',
     },
     {
       name: 'Non Alcoholic',
-      value: 'Non_Alcoholic'
+      value: 'Non_Alcoholic',
     },
     {
       name: 'Ordinary',
-      value: 'Ordinary_Drink'
+      value: 'Ordinary_Drink',
     },
     {
       name: 'Cocktail',
-      value: 'Cocktail'
+      value: 'Cocktail',
     },
     {
       name: 'Cocktail Glass',
-      value: 'Cocktail_glass'
+      value: 'Cocktail_glass',
     },
     {
       name: 'Champagne Flute',
-      value: 'Champagne_flute'
+      value: 'Champagne_flute',
     },
   ]);
 
+  const handleMenuPress = item => {
+    navigation.navigate('DrinkCategoryPage', { category: item.name });
+    navigation.closeDrawer();
+  };
+
   const renderItem = ({ item }) => {
     return (
-      <TouchableOpacity style={styles.renderItem} key={item} onPress={() => {
-        Actions.push('DrinkCategoryPage', { category: item.name });
-        props.drawer.close();
-      }}>
+      <TouchableOpacity
+        style={styles.renderItem}
+        key={item}
+        onPress={() => handleMenuPress(item)}>
         <Text style={styles.renderItem.text}>{item.name}</Text>
       </TouchableOpacity>
     );
@@ -47,7 +51,10 @@ const DrawerMenu = (props) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Cocktails</Text>
-      <FastImage source={require('../assets/images/splash.png')} style={styles.image} />
+      <Image
+        source={require('../assets/images/splash.png')}
+        style={styles.image}
+      />
       <FlatList
         contentContainerStyle={{ paddingBottom: 20 }}
         bounces={false}
@@ -69,14 +76,14 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: '800',
     marginLeft: 8,
-    alignSelf: 'center'
+    alignSelf: 'center',
   },
   image: {
     width: 100,
     height: 100,
     alignSelf: 'center',
     marginVertical: 8,
-    marginTop: 20
+    marginTop: 20,
   },
   flatList: {
     marginTop: 12,
@@ -92,14 +99,14 @@ const styles = StyleSheet.create({
     text: {
       color: '#fff',
       fontSize: 16,
-    }
+    },
   },
   version: {
     color: '#fff',
     fontSize: 16,
     marginLeft: 16,
-    marginBottom: 16
-  }
+    marginBottom: 16,
+  },
 });
 
 export default DrawerMenu;

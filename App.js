@@ -1,69 +1,18 @@
-import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { Router, Scene, Stack, Actions } from 'react-native-router-flux';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import React from 'react';
+import { View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AppNavigator from './src/navigation/AppNavigator';
 import NetworkChecking from './src/components/NetworkChecking';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import HomePage from './src/pages/HomePage';
-import SplashPage from './src/pages/SplashPage';
-import DrinkListPage from './src/pages/DrinkListPage';
-import DrinkCategoryPage from './src/pages/DrinkCategoryPage';
-import DrinkDetailPage from './src/pages/DrinkDetailPage';
 
-const backImage = () => {
+const App = () => {
   return (
-    <TouchableOpacity onPress={() => Actions.pop()} style={{ marginLeft: 16 }}>
-      <Icon name="chevron-left" size={20} color="#fff" />
-    </TouchableOpacity>
-  );
-};
-export default class App extends Component {
-  render() {
-    return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
         <NetworkChecking />
-        <Router
-          duration={0}
-          sceneStyle={styles.scene}
-          navigationBarStyle={styles.navigationBarStyle}
-          renderBackButton={() => backImage()}
-          titleStyle={styles.titleStyle}>
-          <Stack key="root" hideNavBar>
-            <Scene key={'SplashPage'} title=' ' component={SplashPage} initial />
-            <Scene key={'HomePage'} title=' ' component={HomePage} />
-            <Scene key={'DrinkListPage'} title='' component={DrinkListPage} hideNavBar={false} back />
-            <Scene key={'DrinkCategoryPage'} title=' ' component={DrinkCategoryPage} hideNavBar={false} back />
-            <Scene key={'DrinkDetailPage'} title=' ' component={DrinkDetailPage} hideNavBar={false} back />
-          </Stack>
-        </Router>
+        <AppNavigator />
       </View>
-    );
-  }
-}
+    </GestureHandlerRootView>
+  );
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scene: {
-    backgroundColor: '#F5FCFF',
-    shadowOpacity: 1,
-    shadowRadius: 3,
-  },
-  navigationBarStyle: {
-    backgroundColor: '#000',
-    shadowColor: 'transparent',
-  },
-  tabBarStyle: {
-    backgroundColor: '#eee',
-  },
-  tabBarSelectedItemStyle: {
-    backgroundColor: '#ddd',
-  },
-  titleStyle: {
-    color: 'white',
-  },
-});
+export default App;

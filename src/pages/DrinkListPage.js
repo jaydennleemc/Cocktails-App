@@ -1,46 +1,38 @@
-import { Text, View, StyleSheet, FlatList } from 'react-native';
-import React, { Component, useEffect, useState } from 'react';
-import { Actions } from 'react-native-router-flux';
+import { Text, View, StyleSheet, FlatList, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import * as apiService from '../services/APIService';
-import FastImage from 'react-native-fast-image';
 import ListLoader from '../components/ListLoader';
 
 const DrinkListPage = props => {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [drinks, setDrinks] = useState([1, 2, 3, 4, 5]);
 
-  const setTitle = () => {
-    if (props.category === 'Cocktail') {
-      Actions.refresh({ title: 'Cocktail Drinks' });
-    } else {
-      Actions.refresh({ title: 'Ordinary Drinks' });
-    }
-  };
-
   const fetchDrinkList = () => {
-    if (props.category == 'Cocktail') {
-      apiService.getCocktailDrink().then(res => {
-        let data = res.data.drinks;
+    const apiCall =
+      props.category === 'Cocktail'
+        ? apiService.getCocktailDrink()
+        : apiService.getOrdinaryDrink();
+
+    apiCall
+      .then(res => {
+        const data = res?.data?.drinks || [];
         setDrinks(data);
         setLoading(false);
-      }, error => {
+      })
+      .catch(error => {
         console.log(error);
-      });
-    } else {
-      apiService.getOrdinaryDrink().then(res => {
-        let data = res.data.drinks;
-        setDrinks(data);
         setLoading(false);
-      }, error => {
-        console.log(error);
       });
-    }
   };
 
   useEffect(() => {
-    setTitle();
+    navigation.setOptions({
+      title: props.category === 'Cocktail' ? 'Cocktail Drinks' : 'Ordinary Drinks',
+    });
     fetchDrinkList();
-  }, []);
+  }, [navigation, props.category]);
 
   const renderItem = ({ item }) => {
     if (loading) {
@@ -49,19 +41,18 @@ const DrinkListPage = props => {
           <ListLoader />
         </View>
       );
-    } else {
-      return (
-        <View style={styles.renderItem} key={item.idDrink}>
-          <FastImage
-            style={styles.renderItem.image}
-            source={{ uri: item.strDrinkThumb }}
-          />
-          <View style={{ alignContent: 'center', justifyContent: 'center' }}>
-            <Text style={styles.renderItem.text}>{item.strDrink}</Text>
-          </View>
-        </View>
-      );
     }
+    return (
+      <View style={styles.renderItem} key={item.idDrink}>
+        <Image
+          style={styles.renderItem.image}
+          source={{ uri: item.strDrinkThumb }}
+        />
+        <View style={{ alignContent: 'center', justifyContent: 'center' }}>
+          <Text style={styles.renderItem.text}>{item.strDrink}</Text>
+        </View>
+      </View>
+    );
   };
 
   return (

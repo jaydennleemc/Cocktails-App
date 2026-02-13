@@ -1,26 +1,27 @@
-import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import { Actions } from 'react-native-router-flux';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-export default class SplashPage extends Component {
+const SplashPage = () => {
+  const navigation = useNavigation();
 
-  componentDidMount() {
-    setTimeout(() => {
-      Actions.replace('HomePage');
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      navigation.replace('HomePage');
     }, 2000);
-  }
+    return () => clearTimeout(timer);
+  }, [navigation]);
 
-  render() {
-    return (
-      <View style={styles.container}>
-        <FastImage source={require('../assets/images/splash.png')}
-          style={styles.splash}
-          resizeMode={FastImage.resizeMode.contain} />
-      </View>
-    );
-  }
-}
+  return (
+    <View style={styles.container}>
+      <Image
+        source={require('../assets/images/splash.png')}
+        style={styles.splash}
+        resizeMode="contain"
+      />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -28,10 +29,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#000',
-
   },
   splash: {
     width: 200,
     height: 200,
-  }
+  },
 });
+
+export default SplashPage;
