@@ -1,36 +1,44 @@
-import React, { Component, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
-import FastImage from 'react-native-fast-image';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, Image } from 'react-native';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { Actions } from 'react-native-router-flux';
+import { useNavigation } from '@react-navigation/native';
 import PageLoader from '../components/PageLoader';
 import * as apiService from '../services/APIService';
 
-const DrinkCategoryPage = (props) => {
-
+const DrinkCategoryPage = props => {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [drinks, setDrinks] = useState([]);
 
   const fetchDrinks = () => {
-    apiService.getDrinksByCategory(props.category).then(res => {
-      setLoading(false);
-      setDrinks(res.data.drinks);
-    }, error => {
-      console.log(error);
-    });
+    apiService
+      .getDrinksByCategory(props.category)
+      .then(res => {
+        setLoading(false);
+        setDrinks(res?.data?.drinks || []);
+      })
+      .catch(error => {
+        console.log(error);
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
-    Actions.refresh({ title: props.category });
+    navigation.setOptions({
+      title: props.category,
+    });
     fetchDrinks();
-  }, []);
-
+  }, [navigation, props.category]);
 
   const renderItem = ({ item }) => {
     return (
       <View style={styles.renderItem} key={item.idDrink}>
-        <TouchableOpacity style={styles.renderItem.imageContainer} onPress={() => Actions.push('DrinkDetailPage', { drink: item })}>
-          <FastImage
+        <TouchableOpacity
+          style={styles.renderItem.imageContainer}
+          onPress={() =>
+            navigation.navigate('DrinkDetailPage', { drink: item })
+          }>
+          <Image
             resizeMode="stretch"
             style={styles.renderItem.image}
             source={{ uri: item.strDrinkThumb }}
@@ -43,12 +51,16 @@ const DrinkCategoryPage = (props) => {
 
   return (
     <View style={styles.container}>
-      {loading ? <PageLoader /> :
+      {loading ? (
+        <PageLoader />
+      ) : (
         <FlatList
           contentContainerStyle={{ paddingBottom: 20 }}
           data={drinks}
           renderItem={renderItem}
-          numColumns={2} />}
+          numColumns={2}
+        />
+      )}
     </View>
   );
 };
@@ -83,7 +95,7 @@ const styles = StyleSheet.create({
       marginLeft: 16,
       fontWeight: 'bold',
     },
-  }
+  },
 });
 
 export default DrinkCategoryPage;

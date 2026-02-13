@@ -1,49 +1,53 @@
 import React, { useState, useEffect } from 'react';
-import { Facebook, Instagram, List, Code } from 'react-content-loader/native';
-import { StyleSheet, Text, View } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import { ScrollView } from 'react-native-gesture-handler';
-import { Actions } from 'react-native-router-flux';
-import ListLoader from '../components/ListLoader';
+import { StyleSheet, Text, View, Image, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import PageLoader from '../components/PageLoader';
 import * as apiService from '../services/APIService';
 
-const DrinkDetailPage = (props) => {
+const DrinkDetailPage = props => {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
-  const [isRendered, setIsRendered] = useState(true);
   const [drink, setDrink] = useState(null);
 
-  const fetchDrink = (drinkId) => {
+  const fetchDrink = drinkId => {
     apiService
       .getDrinkDetail(drinkId)
       .then(res => {
-        let data = res.data.drinks[0];
-        setDrink(data);
+        const drinksData = res?.data?.drinks;
+        if (drinksData && drinksData[0]) {
+          setDrink(drinksData[0]);
+        }
         setLoading(false);
       })
       .catch(error => {
         console.log(error);
+        setLoading(false);
       });
   };
 
   useEffect(() => {
-    setIsRendered(true);
-    Actions.refresh({ title: props.drink.strDrink });
-    fetchDrink(props.drink.idDrink);
-    return () => {
-      setIsRendered(false);
-    };
-  }, []);
+    navigation.setOptions({
+      title: props.drink?.strDrink || '',
+    });
+    if (props.drink?.idDrink) {
+      fetchDrink(props.drink.idDrink);
+    }
+  }, [navigation, props.drink]);
+
+  if (loading || !drink) {
+    return (
+      <ScrollView style={styles.container}>
+        <PageLoader />
+      </ScrollView>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
-      {loading ? <PageLoader /> :
-        <View>
-          <FastImage style={styles.image} source={{ uri: drink.strDrinkThumb }} />
-          <Text style={styles.typeText}>{drink.strCategory}</Text>
-          <Text style={styles.nameText}>{drink.strDrink}</Text>
-          <Text style={styles.descriptionText}>{drink.strInstructions}</Text>
-        </View>}
+      <Image style={styles.image} source={{ uri: drink.strDrinkThumb }} />
+      <Text style={styles.typeText}>{drink.strCategory}</Text>
+      <Text style={styles.nameText}>{drink.strDrink}</Text>
+      <Text style={styles.descriptionText}>{drink.strInstructions}</Text>
     </ScrollView>
   );
 };

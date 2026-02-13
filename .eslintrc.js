@@ -1,11 +1,16 @@
 module.exports = {
+  root: true,
   extends: ['eslint:recommended', 'plugin:react/recommended'],
   env: {
     'react-native/react-native': true,
     jest: true,
   },
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   parserOptions: {
+    requireConfigFile: false,
+    babelOptions: {
+      presets: ['@babel/preset-react'],
+    },
     ecmaFeatures: {
       ecmaVersion: 8,
       experimentalObjectRestSpread: true,
@@ -27,5 +32,7 @@ module.exports = {
     'react-native/split-platform-components': ['warn'],
     'react-native/no-inline-styles': ['warn'],
     'react-native/no-color-literals': ['off'],
+    eqeqeq: ['error', 'always'],
+    'no-prototype-builtins': 'error',
   },
 };

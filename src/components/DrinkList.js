@@ -1,62 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, FlatList, TouchableOpacity } from 'react-native';
-import FastImage from 'react-native-fast-image';
-import { Actions } from 'react-native-router-flux';
+import { StyleSheet, View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import CircleLoader from './CircleLoader';
 import * as apiService from '../services/APIService';
 
 const DrinkList = props => {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
-  const [isRendered, setIsRendered] = useState(true);
   const [title, setTitle] = useState('Cocktail');
   const [drinks, setDrinks] = useState([1, 2, 3, 4, 5]);
 
   const setDrinkData = data => {
-    // shuffle drinks array
-    data = data.sort(() => Math.random() - 0.5);
-    data = data.splice(0, 10);
-    // splice drink within 10 drinks
-    setDrinks(data);
+    const shuffled = [...data].sort(() => Math.random() - 0.5);
+    const sliced = shuffled.slice(0, 10);
+    setDrinks(sliced);
     setLoading(false);
   };
 
   const fetchDrinkList = () => {
-    if (props.category === 'Cocktail') {
-      apiService.getCocktailDrink().then(res => {
-        let data = res.data.drinks;
-        if (isRendered) {
-          setDrinkData(data);
-        }
+    const apiCall =
+      props.category === 'Cocktail'
+        ? apiService.getCocktailDrink()
+        : apiService.getOrdinaryDrink();
+
+    apiCall
+      .then(res => {
+        const data = res?.data?.drinks || [];
+        setDrinkData(data);
+      })
+      .catch(error => {
+        console.log(error);
+        setLoading(false);
       });
-    } else {
-      apiService.getOrdinaryDrink().then(res => {
-        let data = res.data.drinks;
-        if (isRendered) {
-          setDrinkData(data);
-        }
-      });
-    }
   };
 
   useEffect(() => {
-    setIsRendered(true);
     fetchDrinkList();
-    if (props.category === 'Cocktail') {
-      setTitle('Cocktail');
-    } else {
-      setTitle('Ordinary');
-    }
-    return () => {
-      setIsRendered(false);
-    };
-  }, []);
+    setTitle(props.category === 'Cocktail' ? 'Cocktail' : 'Ordinary');
+  }, [props.category]);
 
   const routeToDrinkDetail = item => {
-    Actions.push('DrinkDetailPage', { drink: item });
+    navigation.navigate('DrinkDetailPage', { drink: item });
   };
 
   const routeToDrinkList = () => {
-    Actions.push('DrinkListPage', { category: title });
+    navigation.navigate('DrinkListPage', { category: title });
   };
 
   const renderItem = ({ item }) => {
@@ -66,19 +54,18 @@ const DrinkList = props => {
           <CircleLoader />
         </View>
       );
-    } else {
-      return (
-        <TouchableOpacity
-          key={item.idDrink}
-          style={styles.renderItem}
-          onPress={() => routeToDrinkDetail(item)}>
-          <FastImage
-            style={styles.renderItem.image}
-            source={{ uri: item.strDrinkThumb }}
-          />
-        </TouchableOpacity>
-      );
     }
+    return (
+      <TouchableOpacity
+        key={item.idDrink}
+        style={styles.renderItem}
+        onPress={() => routeToDrinkDetail(item)}>
+        <Image
+          style={styles.renderItem.image}
+          source={{ uri: item.strDrinkThumb }}
+        />
+      </TouchableOpacity>
+    );
   };
 
   return (
@@ -97,7 +84,8 @@ const DrinkList = props => {
         style={styles.flatlist}
         horizontal
         data={drinks}
-        renderItem={renderItem} />
+        renderItem={renderItem}
+      />
     </View>
   );
 };
